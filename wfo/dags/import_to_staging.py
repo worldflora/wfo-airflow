@@ -7,7 +7,7 @@ from airflow.exceptions import AirflowFailException
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator, SQLThresholdCheckOperator
 
 @dag(
-    schedule=None,
+    schedule="22 4 * * *",
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,
     tags=["wfo", "database"],
