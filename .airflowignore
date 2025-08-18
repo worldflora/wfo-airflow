@@ -1,0 +1,2 @@
+# only scan the python files in the dags directory
+!wfo/dags/*.py

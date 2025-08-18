@@ -6,29 +6,20 @@ from airflow.sdk import dag, task, Variable, Param
 from airflow.exceptions import AirflowFailException
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator, SQLThresholdCheckOperator
 
-def failure_notification_email(context):
-    print(f"Oh know the task has failed")
-
-def success_notification_email(context):
-    print(f"Dingdong the dag has completed")
-
 @dag(
     schedule=None,
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,
-    tags=["roger", "learning"],
+    tags=["wfo", "database"],
     params={"fail_if_db_not_todays":
              Param(True, 
                    type="boolean", 
                    title="Fail if not today's db:", 
                    description="If the latest db dump is not dated today then this will fail. " \
                    "Set to false to import a dump from a previous day e.g. if there was a fail." )},
-    render_template_as_native_obj=True,
-    default_args={
-        'on_failure_callback' : failure_notification_email
-    }
+    render_template_as_native_obj=True
 )
-def roger():
+def import_to_staging():
     """
     ### Restore db
 
@@ -96,7 +87,7 @@ def roger():
         return_last=False,
     )
 
-    @task.bash(on_success_callback=success_notification_email)
+    @task.bash()
     def mysql_import(**context):
         gzip_path = context["ti"].xcom_pull(task_ids="check_backup_file_exists", key="return_value")
         # add the zip path to the context so we can use it in the import task
@@ -113,10 +104,9 @@ def roger():
         conn_id="airflow_wfo",
         sql="SELECT count(*) FROM `promethius`.`names`;",
         min_threshold=1600000,
-        max_threshold=2000000,
-        on_success_callback=success_notification_email
+        max_threshold=2000000
     )
 
     check_backup_file_exists() >> drop_old_db >> create_new_db >> mysql_import() >> sanity_check_name_count
     
-roger()
+import_to_staging()
