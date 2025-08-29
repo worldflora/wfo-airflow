@@ -34,6 +34,6 @@ def hello_wfo_airflow():
         sql_results = context["ti"].xcom_pull(task_ids="show_tables", key="return_value")
         print(sql_results)
 
-    bash_list() >> show_tables >> print_tables()
+    [bash_list(), show_tables, print_tables()]
 
 hello_wfo_airflow()
