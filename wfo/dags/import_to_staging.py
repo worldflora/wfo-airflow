@@ -1,7 +1,7 @@
 import re
 import os
 import datetime
-from pendulum import timedelta
+import pendulum
 from airflow.sdk import dag, task, Variable, Param
 from airflow.exceptions import AirflowFailException
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator, SQLThresholdCheckOperator
@@ -87,7 +87,7 @@ def import_to_staging():
         return_last=False,
     )
 
-    @task.bash( retries = 3, retry_delay = timedelta(minutes=60))
+    @task.bash( retries = 3, retry_delay = pendulum.duration(minutes=60))
     def mysql_import(**context):
         gzip_path = context["ti"].xcom_pull(task_ids="check_backup_file_exists", key="return_value")
         # add the zip path to the context so we can use it in the import task
