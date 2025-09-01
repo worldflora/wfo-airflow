@@ -110,7 +110,7 @@ INSERT_SQL = """INSERT INTO `kew`.`ipni_new`
     );"""
 
 @dag(
-    schedule=None,
+    schedule="40 03 * * *",
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,
     tags=["wfo", "ipni", "kew"],
