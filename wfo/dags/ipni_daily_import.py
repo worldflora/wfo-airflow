@@ -212,8 +212,17 @@ def ipni_daily_import():
         sql="RENAME TABLE `kew`.`ipni_new` to `kew`.`ipni`;"
     )
 
+    def remove_csv_file(**context):
+
+        # get the file connection
+        xz_file_path = context["ti"].xcom_pull(task_ids="download_file", key="return_value")
+        csv_file_path = os.path.splitext(xz_file_path)[0] # first item in tuple
+
+        if os.path.exists(csv_file_path):
+            os.remove(csv_file_path)
+        
     # the actual process
-    create_database >> expand_xz_file(download_file()) >> drop_new_data_table >> create_new_data_table >> import_table_rows() >> check_same_or_more_rows >> drop_old_table >> rename_new_table
+    create_database >> expand_xz_file(download_file()) >> drop_new_data_table >> create_new_data_table >> import_table_rows() >> check_same_or_more_rows >> drop_old_table >> rename_new_table >> remove_csv_file()
 
 dag = ipni_daily_import()
 
