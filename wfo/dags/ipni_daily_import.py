@@ -212,6 +212,7 @@ def ipni_daily_import():
         sql="RENAME TABLE `kew`.`ipni_new` to `kew`.`ipni`;"
     )
 
+    @task
     def remove_csv_file(**context):
 
         # get the file connection
