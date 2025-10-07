@@ -14,7 +14,7 @@ if not os.path.exists(rss_subdir):
     os.makedirs(rss_subdir)
 
 @dag(
-    schedule=None,
+    schedule="14 08 * * *",
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,
     tags=["wfo", "util"],
