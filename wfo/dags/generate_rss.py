@@ -64,9 +64,9 @@ def generate_rss():
 		<id>https://list.worldfloraonline.org/rhakhis/ui/index.html#{1}</id>
         <published>{2}</published>
 		<updated>{3}</updated>
-		<summary>{4}</summary>
+		<summary><![CDATA[{4}]]></summary>
 		<author>
-			<name>{5}</name>
+			<name><![CDATA[{5}]]></name>
             <uri>https://orcid.org/{6}</uri>
 		</author>
 	</entry>
