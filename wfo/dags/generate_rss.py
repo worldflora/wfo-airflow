@@ -46,11 +46,11 @@ def generate_rss():
             header = '''<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-	<title>{0}</title>
+	<title><![CDATA[{0}]]></title>
 	<subtitle>Latest changes in Rhakhis belonging to {0}</subtitle>
-	<id>https://list.worldfloraonline.org/rhakhis/data/downloads/rss/{3}/{1}.xml</id>
-    <link href="https://list.worldfloraonline.org/rhakhis/data/downloads/rss/index.html" />
-    <link rel="self" href="https://list.worldfloraonline.org/rhakhis/data/downloads/rss/{3}/{1}.xml" />
+	<id>https://rhakhis.rbge.info/rhakhis/api/downloads/rss/{3}/{1}.xml</id>
+    <link href="https://rhakhis.rbge.info/rhakhis/api/downloads/rss/index.html" />
+    <link rel="self" href="https://rhakhis.rbge.info/rhakhis/api/downloads/rss/{3}/{1}.xml" />
 	<updated>{2}</updated>
 '''.format(file_name, file_name, now.strftime('%Y-%m-%dT%H:%M:%SZ'), dir_name)
 
@@ -59,7 +59,7 @@ def generate_rss():
             for row in rows:
                 entry = '''
 	<entry>
-		<title>{0} {7} [{1}]</title>
+		<title><![CDATA[{0} {7} ({1})]]></title>
 		<link href="https://list.worldfloraonline.org/rhakhis/ui/index.html#{1}" />
 		<id>https://list.worldfloraonline.org/rhakhis/ui/index.html#{1}</id>
         <published>{2}</published>
