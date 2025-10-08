@@ -182,9 +182,12 @@ def generate_rss():
 <title>RSS Feeds for Rhakhis</title>
 </head>
 <body>
+<div style='display: block; float: right; max-width: 16em; margin: 1em;'>
+    <a href="https://tettris.eu/" target="tettris"><img src="../../images/tettris.png" width="100%" /></a>
+</div>
 <h1>RSS Feeds for Rhakhis</h1>
 <p>
-    These are the feeds of recently changed name in the Rhakhis taxonomic editor.
+    These are the RSS (Atom 1.0) feeds of recently changed names in the Rhakhis taxonomic editor.
     Records changed in the last 30 days or since the system was initiated are included.
     This service was developed as part of a project funded by <a href="https://tettris.eu/">TETTRIs</a>. 
 </p>
@@ -207,13 +210,17 @@ def generate_rss():
                         current_order = row['order'] # flag we are starting a new one
 
                         #start a new ul for the order
-                        file.write(f'\n<a href="{row["order"]}/{row["order"]}.xml"><h2>{row["order"]}</h2></a>\n')
+                        file.write(f'\n<h2>{row["order"]}&nbsp;')
+                        file.write(f'<a href="{row["order"]}/{row["order"]}.xml"><img src="../../images/feed-icon.png" width="18px" /></a>')
+                        file.write('</h2>\n')
                         file.write('<ul>\n')
 
                     # make sure there is a file for every family
                     write_out_file(row['order'], row['family'], [])
-                    file.write(f'\n<li><a href="{row["order"]}/{row["family"]}.xml">{row["family"]}</a></li>\n')
-
+                    file.write(f'\n<li>{row["family"]}&nbsp;')
+                    # feed icon as link
+                    file.write(f'<a href="{row["order"]}/{row["family"]}.xml"><img src="../../images/feed-icon.png" width="18px" /></a>')
+                    file.write(f'</li>\n')
                 footer = '''
 </ul>
 </body>
