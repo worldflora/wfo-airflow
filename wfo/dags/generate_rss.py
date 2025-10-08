@@ -97,6 +97,7 @@ def generate_rss():
         # we gather the rows for file we will output
         order_rows = []
         family_rows = []
+        all_rows = []
 
         data_dir = os.path.join(os.path.dirname(__file__), 'sql')
         data_path = os.path.join(data_dir, 'modified_by_order_family.sql')
@@ -147,11 +148,12 @@ def generate_rss():
                 # add the row to the order and family output
                 order_rows.append(row)
                 family_rows.append(row)
+                all_rows.append(row)
 
         # write out the last order and family
         write_out_file(current_order, current_order, order_rows)
         write_out_file(current_order, current_family, family_rows)
-
+        write_out_file('all', 'all', all_rows)
 
     @task
     def update_index():
@@ -194,6 +196,8 @@ def generate_rss():
 '''
                 file.write(header)
 
+                file.write(f'<p>All changes <a href="all/all.xml"><img src="../../images/feed-icon.png" width="18px" /></a></p>')
+                
                 # get the names of the columns
                 columns = [col[0] for col in cursor.description]
 
