@@ -3,7 +3,6 @@ import os
 import pendulum
 import gzip
 import glob
-import datetime
 from airflow.sdk import dag, task, Variable,  Param
 from airflow.providers.mysql.hooks.mysql import MySqlHook
 
@@ -94,9 +93,9 @@ def generate_sitemaps():
                 page_number += 1
     
     @task()
-    def write_index_file():
+    def write_index_file(**context):
 
-        now_str = datetime.datetime.now().isoformat()
+        now_str = context["params"]["data_release_date"]
         gz_files = glob.glob(sitemaps_subdir + '/*.xml.gz')
 
         # create the file
