@@ -78,7 +78,7 @@ def generate_sitemaps():
                     file.write(f"""
     <url>
         <loc>https://www.wfoplantlist.org/taxon/{taxon_id}</loc>
-        <lastmod>{date}/lastmod>
+        <lastmod>{date}</lastmod>
         <changefreq>yearly</changefreq>
     </url>                             
                                """)
