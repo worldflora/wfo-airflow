@@ -2,6 +2,7 @@ import pendulum
 import requests
 import os
 import csv
+import importlib.resources
 from airflow.sdk import dag, task, Variable
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator, SQLCheckOperator
 from airflow.providers.mysql.hooks.mysql import MySqlHook
@@ -114,7 +115,8 @@ INSERT_SQL = """INSERT INTO `kew`.`ipni_new`
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,
     tags=["wfo", "ipni", "kew"],
-    template_searchpath=['../includes/']
+    #template_searchpath=['/Users/rogerhyam/airflow/dags/sql']
+    template_searchpath=[str(importlib.resources.path("includes", "sql"))]
 )
 def ipni_daily_import():
     """
@@ -160,7 +162,7 @@ def ipni_daily_import():
     create_new_data_table = SQLExecuteQueryOperator(
         task_id="create_new_data_table",
         conn_id="airflow_wfo",
-        sql="sql/ipni.sql"
+        sql='ipni.sql'
     )
 
     @task
