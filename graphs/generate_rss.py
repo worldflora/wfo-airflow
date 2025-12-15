@@ -163,79 +163,80 @@ def generate_rss():
         #data_dir = os.path.join(os.path.dirname(__file__), 'sql')
         #data_path = os.path.join(data_dir, 'all_orders_families.sql')
 
-        data_path = resources.path(includes.sql, "all_orders_families.sql")
-        with open(data_path, encoding='utf-8') as fp:
-            sqltxt = fp.read()
 
-        # get the db connection
-        mysql_hook = MySqlHook(mysql_conn_id="airflow_wfo")
-        conn = mysql_hook.get_conn()
-        cursor = conn.cursor()
+        with resources.path(includes.sql, "all_orders_families.sql") as data_path:
+            with open(data_path, encoding='utf-8') as fp:
+                sqltxt = fp.read()
 
-        # run the query to get all the changed 
-        cursor.execute(sqltxt)
-        while cursor.nextset():
-            results = cursor.fetchall()
-            if not results: continue
+            # get the db connection
+            mysql_hook = MySqlHook(mysql_conn_id="airflow_wfo")
+            conn = mysql_hook.get_conn()
+            cursor = conn.cursor()
 
-            # start the index file
-            with open(rss_subdir + '/index.html', "w") as file:
+            # run the query to get all the changed 
+            cursor.execute(sqltxt)
+            while cursor.nextset():
+                results = cursor.fetchall()
+                if not results: continue
+
+                # start the index file
+                with open(rss_subdir + '/index.html', "w") as file:
 
 
-                header = '''<!DOCTYPE html>
-<html>
-<head>
-<title>RSS Feeds for Rhakhis</title>
-</head>
-<body>
-<div style='display: block; float: right; max-width: 16em; margin: 1em;'>
-    <a href="https://tettris.eu/" target="tettris"><img src="../../images/tettris.png" width="100%" /></a>
-</div>
-<h1>RSS Feeds for Rhakhis</h1>
-<p>
-    These are the RSS (Atom 1.0) feeds of recently changed names in the Rhakhis taxonomic editor.
-    Records changed in the last 30 days or since the system was initiated are included.
-    This service was developed as part of a project funded by <a href="https://tettris.eu/">TETTRIs</a>. 
-</p>
-'''
-                file.write(header)
+                    header = '''<!DOCTYPE html>
+    <html>
+    <head>
+    <title>RSS Feeds for Rhakhis</title>
+    </head>
+    <body>
+    <div style='display: block; float: right; max-width: 16em; margin: 1em;'>
+        <a href="https://tettris.eu/" target="tettris"><img src="../../images/tettris.png" width="100%" /></a>
+    </div>
+    <h1>RSS Feeds for Rhakhis</h1>
+    <p>
+        These are the RSS (Atom 1.0) feeds of recently changed names in the Rhakhis taxonomic editor.
+        Records changed in the last 30 days or since the system was initiated are included.
+        This service was developed as part of a project funded by <a href="https://tettris.eu/">TETTRIs</a>. 
+    </p>
+    '''
+                    file.write(header)
 
-                file.write(f'<p>All changes <a href="all/all.xml"><img src="../../images/feed-icon.png" width="18px" /></a></p>')
-                
-                # get the names of the columns
-                columns = [col[0] for col in cursor.description]
+                    file.write(f'<p>All changes <a href="all/all.xml"><img src="../../images/feed-icon.png" width="18px" /></a></p>')
+                    
+                    # get the names of the columns
+                    columns = [col[0] for col in cursor.description]
 
-                current_order = None
-                for r in results:
-                    row = dict(zip(columns, r))
+                    current_order = None
+                    for r in results:
+                        row = dict(zip(columns, r))
 
-                    # order files when we have new orders
-                    if current_order != row['order']:
-                        write_out_file(row['order'], row['order'], [])
+                        # order files when we have new orders
+                        if current_order != row['order']:
+                            write_out_file(row['order'], row['order'], [])
 
-                        if current_order != None: file.write("</ul>\n")
+                            if current_order != None: file.write("</ul>\n")
 
-                        current_order = row['order'] # flag we are starting a new one
+                            current_order = row['order'] # flag we are starting a new one
 
-                        #start a new ul for the order
-                        file.write(f'\n<h2>{row["order"]}&nbsp;')
-                        file.write(f'<a href="{row["order"]}/{row["order"]}.xml"><img src="../../images/feed-icon.png" width="18px" /></a>')
-                        file.write('</h2>\n')
-                        file.write('<ul>\n')
+                            #start a new ul for the order
+                            file.write(f'\n<h2>{row["order"]}&nbsp;')
+                            file.write(f'<a href="{row["order"]}/{row["order"]}.xml"><img src="../../images/feed-icon.png" width="18px" /></a>')
+                            file.write('</h2>\n')
+                            file.write('<ul>\n')
 
-                    # make sure there is a file for every family
-                    write_out_file(row['order'], row['family'], [])
-                    file.write(f'\n<li>{row["family"]}&nbsp;')
-                    # feed icon as link
-                    file.write(f'<a href="{row["order"]}/{row["family"]}.xml"><img src="../../images/feed-icon.png" width="18px" /></a>')
-                    file.write(f'</li>\n')
-                footer = '''
-</ul>
-</body>
-</html>
-'''
-                file.write(footer)
-                file.close()
+                        # make sure there is a file for every family
+                        write_out_file(row['order'], row['family'], [])
+                        file.write(f'\n<li>{row["family"]}&nbsp;')
+                        # feed icon as link
+                        file.write(f'<a href="{row["order"]}/{row["family"]}.xml"><img src="../../images/feed-icon.png" width="18px" /></a>')
+                        file.write(f'</li>\n')
+                    footer = '''
+    </ul>
+    </body>
+    </html>
+    '''
+                    file.write(footer)
+                    file.close()
 
     update_rss_files() >> update_index()
 
