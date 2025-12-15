@@ -1,5 +1,7 @@
 
 import pendulum
+import sys
+from importlib import resources
 from airflow.sdk import dag, task
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 
@@ -33,7 +35,15 @@ def hello_wfo_airflow():
     def print_tables(**context):
         sql_results = context["ti"].xcom_pull(task_ids="show_tables", key="return_value")
         print(sql_results)
+    
+    @task()
+    def print_search_path(**context):
+        for path in sys.path:
+            print(path)
 
-    [bash_list(), show_tables, print_tables()]
+        for f in resources.files('includes.sql').iterdir():
+            print(f)
+
+    [bash_list(), show_tables, print_tables(), print_search_path()]
 
 hello_wfo_airflow()
