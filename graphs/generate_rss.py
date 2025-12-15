@@ -3,6 +3,7 @@ import os
 import pendulum
 import datetime
 from importlib import resources
+import includes.sql
 from airflow.sdk import dag, task, Variable
 from airflow.providers.mysql.hooks.mysql import MySqlHook
 
@@ -103,7 +104,7 @@ def generate_rss():
         #data_dir = os.path.join(os.path.dirname(__file__), 'sql')
         #data_path = os.path.join(data_dir, 'modified_by_order_family.sql')
         
-        data_path = str(resources.path("includes.sql", "modified_by_order_family.sql"))
+        data_path = str(resources.path(includes.sql, "modified_by_order_family.sql"))
         print(data_path)
         with open(data_path, encoding='utf-8') as fp:
             sqltxt = fp.read()
@@ -165,7 +166,7 @@ def generate_rss():
         #data_dir = os.path.join(os.path.dirname(__file__), 'sql')
         #data_path = os.path.join(data_dir, 'all_orders_families.sql')
 
-        data_path = resources.path("includes.sql", "all_orders_families.sql")
+        data_path = resources.path(includes.sql, "all_orders_families.sql")
         with open(data_path, encoding='utf-8') as fp:
             sqltxt = fp.read()
 
