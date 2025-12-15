@@ -100,65 +100,62 @@ def generate_rss():
         order_rows = []
         family_rows = []
         all_rows = []
-
-        #data_dir = os.path.join(os.path.dirname(__file__), 'sql')
-        #data_path = os.path.join(data_dir, 'modified_by_order_family.sql')
         
-        data_path = str(resources.path(includes.sql, "modified_by_order_family.sql"))
-        print(data_path)
-        with open(data_path, encoding='utf-8') as fp:
-            sqltxt = fp.read()
+        with resources.path(includes.sql, "modified_by_order_family.sql") as data_path:
+            print(data_path)
+            with open(data_path, encoding='utf-8') as fp:
+                sqltxt = fp.read()
 
-        # get the db connection
-        mysql_hook = MySqlHook(mysql_conn_id="airflow_wfo")
-        conn = mysql_hook.get_conn()
-        cursor = conn.cursor()
+            # get the db connection
+            mysql_hook = MySqlHook(mysql_conn_id="airflow_wfo")
+            conn = mysql_hook.get_conn()
+            cursor = conn.cursor()
 
-        # run the query to get all the changed 
-        cursor.execute(sqltxt)
-        while cursor.nextset():
-            results = cursor.fetchall()
-            if not results: continue
+            # run the query to get all the changed 
+            cursor.execute(sqltxt)
+            while cursor.nextset():
+                results = cursor.fetchall()
+                if not results: continue
 
-            # get the names of the columns
-            columns = [col[0] for col in cursor.description]
+                # get the names of the columns
+                columns = [col[0] for col in cursor.description]
 
 
-            for r in results:
-                row = dict(zip(columns, r))
+                for r in results:
+                    row = dict(zip(columns, r))
 
-                # get clean names for order and family
-                order = row['order']
-                if order == None: order = 'unplaced'
-                family = row['family']
-                if family == None: family = 'unplaced'
+                    # get clean names for order and family
+                    order = row['order']
+                    if order == None: order = 'unplaced'
+                    family = row['family']
+                    if family == None: family = 'unplaced'
 
-                # initialise the first order and family 
-                if not current_order: current_order = order
-                if not current_family: current_family = family
+                    # initialise the first order and family 
+                    if not current_order: current_order = order
+                    if not current_family: current_family = family
 
-                # move to the next order so write the last one out and initialise the next
-                if order != current_order:
-                     # order is in a file called its own name in the folder callled its own name
-                     write_out_file(current_order, current_order, order_rows)
-                     current_order = order
-                     order_rows = []
+                    # move to the next order so write the last one out and initialise the next
+                    if order != current_order:
+                        # order is in a file called its own name in the folder callled its own name
+                        write_out_file(current_order, current_order, order_rows)
+                        current_order = order
+                        order_rows = []
 
-                # move to the next family so write the last one out and initialise the next
-                if family != current_family:
-                     write_out_file(current_order, current_family, family_rows)
-                     current_family = family
-                     family_rows = []
+                    # move to the next family so write the last one out and initialise the next
+                    if family != current_family:
+                        write_out_file(current_order, current_family, family_rows)
+                        current_family = family
+                        family_rows = []
 
-                # add the row to the order and family output
-                order_rows.append(row)
-                family_rows.append(row)
-                all_rows.append(row)
+                    # add the row to the order and family output
+                    order_rows.append(row)
+                    family_rows.append(row)
+                    all_rows.append(row)
 
-        # write out the last order and family
-        write_out_file(current_order, current_order, order_rows)
-        write_out_file(current_order, current_family, family_rows)
-        write_out_file('all', 'all', all_rows)
+            # write out the last order and family
+            write_out_file(current_order, current_order, order_rows)
+            write_out_file(current_order, current_family, family_rows)
+            write_out_file('all', 'all', all_rows)
 
     @task
     def update_index():
