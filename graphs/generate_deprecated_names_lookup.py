@@ -14,7 +14,7 @@ os.environ['NO_PROXY'] = '*'
     schedule=None,
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,
-    tags=["wfo", "util", "facet"],
+    tags=["wfo", "lookup", "solstice"],
 )
 def generate_deprecated_names_lookup():
 
