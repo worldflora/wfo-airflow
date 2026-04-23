@@ -7,7 +7,7 @@ from airflow.exceptions import AirflowFailException
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator, SQLThresholdCheckOperator
 
 @dag(
-    schedule="22 4 * * *",
+    schedule=None,
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,
     tags=["wfo", "database"],
@@ -22,6 +22,8 @@ from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator, 
 def import_to_staging():
     """
     ### Restore db
+
+    DON'T USE THIS ON THE LIVE MACHINE!! ONLY KEPT FOR REFERENCE.
 
     The live server uses rsync to copy across backup files every day.
     This will import the most recent databased dump file

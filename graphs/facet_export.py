@@ -133,7 +133,8 @@ def facet_export():
             VALUES 
             (%s, %s, %s,%s,%s,%s,%s,%s)"""
 
-        sqltxt = f"SELECT wfo_id FROM wfo_facets.wfo_scores where source_id = {source_id} ORDER BY wfo_id;"
+        #sqltxt = f"SELECT wfo_id FROM wfo_facets.wfo_scores where source_id = {source_id} ORDER BY wfo_id;"
+        sqltxt = f"SELECT wfo_id FROM wfo_facets.wfo_scores join where source_id = {source_id} ORDER BY wfo_id;"
         
        
         mysql_hook = MySqlHook(mysql_conn_id="airflow_wfo")
@@ -281,38 +282,42 @@ def facet_export():
     def export_csv_file(**context):
         
         table_name = context["ti"].xcom_pull(task_ids="fetch_next_job", key="cache_table_name")
+        source_id = context["ti"].xcom_pull(task_ids="fetch_next_job", key="source_id")
         out_dir = context["ti"].xcom_pull(task_ids="create_output_directory", key="out_dir")
         ds_row = context["ti"].xcom_pull(task_ids="fetch_next_job", key="job_row") 
         ds_name = ds_row['data_source_name'] # name of datasource will be file name
         file_name = re.sub(r"[/\\?%*:|\"<>\x7F\x00-\x1F ]", "_", ds_name) # file safe the name
         file_path = f"{out_dir}/{file_name}.csv.gz" # full path to out file
-        exporter = FacetExporterCsv(file_path, table_name)
+        exporter = FacetExporterCsv(file_path, table_name, source_id)
         return exporter.runExport()
 
     @task
     def export_html_file(**context):
         
         table_name = context["ti"].xcom_pull(task_ids="fetch_next_job", key="cache_table_name")
+        source_id = context["ti"].xcom_pull(task_ids="fetch_next_job", key="source_id")
         out_dir = context["ti"].xcom_pull(task_ids="create_output_directory", key="out_dir")
         ds_row = context["ti"].xcom_pull(task_ids="fetch_next_job", key="job_row") 
         ds_name = ds_row['data_source_name'] # name of datasource will be file name
         file_name = re.sub(r"[/\\?%*:|\"<>\x7F\x00-\x1F ]", "_", ds_name) # file safe the name
         file_path = f"{out_dir}/{file_name}.html.gz" # full path to out file
 
-        exporter = FacetExporterHtml(file_path, table_name)
+        exporter = FacetExporterHtml(file_path, table_name, source_id)
         return exporter.runExport(ds_row)
     
     @task
     def export_coldp_archive(**context):
 
         table_name = context["ti"].xcom_pull(task_ids="fetch_next_job", key="cache_table_name")
+        source_id = context["ti"].xcom_pull(task_ids="fetch_next_job", key="source_id")
+        
         out_dir = context["ti"].xcom_pull(task_ids="create_output_directory", key="out_dir")
         ds_row = context["ti"].xcom_pull(task_ids="fetch_next_job", key="job_row") 
         ds_name = ds_row['data_source_name'] # name of datasource will be file name
         file_name = re.sub(r"[/\\?%*:|\"<>\x7F\x00-\x1F ]", "_", ds_name) # file safe the name
         file_path = f"{out_dir}/{file_name}.coldp.zip" # full path to out file
 
-        exporter = FacetExporterColDp(file_path, table_name)
+        exporter = FacetExporterColDp(file_path, table_name, source_id)
         return exporter.runExport()
 
 

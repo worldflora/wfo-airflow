@@ -1,3 +1,5 @@
+# this could probably be deleted
+# keeping here for example code
 
 import gzip
 import json
