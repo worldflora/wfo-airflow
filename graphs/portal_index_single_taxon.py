@@ -15,7 +15,7 @@ os.environ['NO_PROXY'] = '*'
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,
     tags=["wfo", "portal"],
-        params={"wfo_taxon_id":
+    params={"wfo_taxon_id":
         Param( 
             type="string",
             title="WFO Taxon ID:", 
