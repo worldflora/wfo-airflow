@@ -48,9 +48,9 @@ def portal_index_facets_metadata():
         return metadata
     
     @task()
-    def push_metadata_to_portal(metadata):
+    def push_metadata_to_portal(facet_metadata):
         portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
-        response = portal.pushFacetMetadata(metadata)
+        response = portal.pushFacetMetadata(facet_metadata)
         if not response['success']: 
             print(response['message'])
             raise AirflowFailException("Failed to save metadata to index")
