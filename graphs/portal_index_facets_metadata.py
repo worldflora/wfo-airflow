@@ -2,7 +2,6 @@
 import pendulum
 from airflow.sdk import dag, task, Variable, Param
 from datetime import timedelta
-from airflow.timetables.trigger import DeltaTriggerTimetable
 from airflow.sdk.exceptions import AirflowFailException
 import os
 import json
@@ -33,30 +32,37 @@ def portal_index_facets_metadata():
     def fetch_last_modified_from_portal(**context):
 
         # if flagged to index all we simple index from the start of the epoc
-        if context["params"]["index_all"]: return 0
+        if context["params"]["index_all"]:
+            context["ti"].xcom_push(key="since", value=0)
+            return 0
 
         # didn't index all so we are getting the 
         print('calling portal')
         portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
-        return portal.getFacetMetadataLastModified()
+        since =  portal.getFacetMetadataLastModified()
+        context["ti"].xcom_push(key="since", value=since)
+        return since
 
     @task()
-    def fetch_metadata_from_fyllo(since):
+    def fetch_metadata_from_fyllo(**context):
         fyllo = FylloApi(Variable.get("fyllo-api-url"), Variable.get("fyllo-api-token"))
+        since = context["ti"].xcom_pull(task_ids="fetch_last_modified_from_portal", key="since")
         metadata = fyllo.fetchFacetMetadata(since)
         print(f"Metadata documents fetched: {len(metadata['docs'])}")
+        context["ti"].xcom_push(key="metadata", value=metadata)
         return metadata
     
     @task()
-    def push_metadata_to_portal(facet_metadata):
+    def push_metadata_to_portal(**context):
         portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
-        response = portal.pushFacetMetadata(facet_metadata)
+        metadata = context["ti"].xcom_pull(task_ids="fetch_metadata_from_fyllo", key="metadata")
+        response = portal.pushFacetMetadata(metadata)
         if not response['success']: 
             print(response['message'])
             raise AirflowFailException("Failed to save metadata to index")
             
     # dag wiring diagram
-    push_metadata_to_portal(fetch_metadata_from_fyllo(fetch_last_modified_from_portal()))
+    fetch_last_modified_from_portal() >> fetch_metadata_from_fyllo() >>  push_metadata_to_portal()
 
 portal_index_facets_metadata()
 
