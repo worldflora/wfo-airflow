@@ -41,22 +41,21 @@ def portal_index_sources_metadata():
         return portal.getSourceMetadataLastModified()
 
     @task()
-    def fetch_metadata_from_fyllo(since):
+    def fetch_and_push(since):
+        
         fyllo = FylloApi(Variable.get("fyllo-api-url"), Variable.get("fyllo-api-token"))
         metadata = fyllo.fetchSourceMetadata(since)
         print(f"Metadata documents fetched: {len(metadata['docs'])}")
-        return metadata
-    
-    @task()
-    def push_metadata_to_portal(metadata):
+        
         portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
         response = portal.pushSourceMetadata(metadata)
         if not response['success']: 
             print(response['message'])
             raise AirflowFailException("Failed to save metadata to index")
-            
+    
+      
     # dag wiring diagram
-    push_metadata_to_portal(fetch_metadata_from_fyllo(fetch_last_modified_from_portal()))
+    fetch_and_push(fetch_last_modified_from_portal())
 
 portal_index_sources_metadata()
 

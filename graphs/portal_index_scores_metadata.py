@@ -52,14 +52,14 @@ def portal_index_scores_metadata():
         return portal.getScoresMetadataLastModified()
 
     @task()
-    def fetch_metadata_from_fyllo(since):
+    def fetch_and_push_metadata(since):
+
+        # from fyllo
         fyllo = FylloApi(Variable.get("fyllo-api-url"), Variable.get("fyllo-api-token"))
         metadata = fyllo.fetchScoresMetadata(since)
         print(f"Metadata documents fetched: {len(metadata['docs'])}")
-        return metadata
-    
-    @task()
-    def push_metadata_to_portal(metadata):
+
+        # to portal
         portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
         if len(metadata['docs']) > 0:
             response = portal.pushScoresMetadata(metadata)
@@ -68,9 +68,10 @@ def portal_index_scores_metadata():
                 raise AirflowFailException("Failed to save metadata to index")
         else:
             print("Nothing to push")
+    
                         
     # dag wiring diagram
-    push_metadata_to_portal(fetch_metadata_from_fyllo(fetch_last_modified_from_portal(delete_scores_metadata())))
+    fetch_and_push_metadata(fetch_last_modified_from_portal(delete_scores_metadata()))
 
 portal_index_scores_metadata()
 

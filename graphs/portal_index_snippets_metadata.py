@@ -52,16 +52,14 @@ def portal_index_snippets_metadata():
         return portal.getSnippetsMetadataLastModified()
 
     @task()
-    def fetch_metadata_from_fyllo(since):
+    def fetch_and_push(since):
+
         fyllo = FylloApi(Variable.get("fyllo-api-url"), Variable.get("fyllo-api-token"))
         metadata = fyllo.fetchSnippetsMetadata(since)
         print(f"Metadata documents fetched: {len(metadata['docs'])}")
-        return metadata
-    
-    @task()
-    def push_metadata_to_portal(metadata):
-        portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
+
         if len(metadata['docs']) > 0:
+            portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
             response = portal.pushSnippetsMetadata(metadata)
             if not response['success']: 
                 print(response['message'])
@@ -70,7 +68,7 @@ def portal_index_snippets_metadata():
             print("Nothing to push")
         
     # dag wiring diagram
-    push_metadata_to_portal(fetch_metadata_from_fyllo(fetch_last_modified_from_portal(delete_snippets_metadata())))
+    fetch_and_push(fetch_last_modified_from_portal(delete_snippets_metadata()))
 
 portal_index_snippets_metadata()
 

@@ -39,21 +39,18 @@ def portal_index_single_taxon():
         else: raise AirflowFailException("No data returned by portal")
     
     @task()
-    def fetch_taxon_values_from_fyllo(taxon_graph):
-        fyllo = FylloApi(Variable.get("fyllo-api-url"), Variable.get("fyllo-api-token"))
-        data = fyllo.fetchTaxonValues(taxon_graph)
-        if data: return data
-        else: raise AirflowFailException("No data returned by Fyllo")
+    def fetch_and_push(taxon_graph):
 
-    @task()
-    def push_taxon_values_to_portal(taxon_values):
+        fyllo = FylloApi(Variable.get("fyllo-api-url"), Variable.get("fyllo-api-token"))
+        taxon_values = fyllo.fetchTaxonValues(taxon_graph)
+        if not taxon_values: raise AirflowFailException("No data returned by Fyllo")
+
         portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
         data = portal.pushTaxonValues(taxon_values)
-        if data: return data
-        else: raise AirflowFailException("No data returned by portal")
+        if not data: raise AirflowFailException("No data returned by portal")
 
     # dag wiring diagram
-    push_taxon_values_to_portal(fetch_taxon_values_from_fyllo(fetch_taxon_graph_from_portal()))
+    fetch_and_push(fetch_taxon_graph_from_portal())
 
 portal_index_single_taxon()
 
