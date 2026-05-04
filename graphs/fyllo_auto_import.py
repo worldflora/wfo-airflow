@@ -2,8 +2,10 @@
 import pendulum
 from airflow.sdk import dag, task, Variable, Param
 from airflow.exceptions import AirflowFailException
+from airflow.timetables.trigger import DeltaTriggerTimetable
 import os
 import json
+from datetime import timedelta
 from includes.portal_api import PortalApi
 from includes.fyllo_api import FylloApi
 
@@ -11,7 +13,7 @@ from includes.fyllo_api import FylloApi
 os.environ['NO_PROXY'] = '*'
 
 @dag(
-    schedule=None,
+    schedule=DeltaTriggerTimetable(timedelta(minutes=30)),
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,
     tags=["wfo", "fyllo"],
