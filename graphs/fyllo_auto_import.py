@@ -13,9 +13,10 @@ from includes.fyllo_api import FylloApi
 os.environ['NO_PROXY'] = '*'
 
 @dag(
-    schedule=DeltaTriggerTimetable(timedelta(minutes=30)),
+    schedule=DeltaTriggerTimetable(timedelta(minutes=20)),
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,
+    max_active_runs=1,
     tags=["wfo", "fyllo"],
 )
 def fyllo_auto_import():
