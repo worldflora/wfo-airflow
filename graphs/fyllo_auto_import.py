@@ -18,8 +18,9 @@ os.environ['NO_PROXY'] = '*'
 )
 def fyllo_auto_import():
     """
-    ### Update the portal index for a single taxon - WFO ID passed in
+    ### Import the oldest stale datasource into Fyllo
     """
+
     @task.short_circuit()
     def fetch_next_import_job(**context):
 
@@ -42,7 +43,7 @@ def fyllo_auto_import():
         print(f"Processing datasource: {source_data['source_id']}")
 
         fyllo = FylloApi(Variable.get("fyllo-api-url"), Variable.get("fyllo-api-token"))
-        source_data['page_size'] = 1000 # set what we can 
+        source_data['page_size'] = 100 # small page size to prevent timeouts 
 
         while source_data := fyllo.pageImportJob(source_data):
             
@@ -61,7 +62,6 @@ def fyllo_auto_import():
             
         # print the last one we produce
         print(source_data)
-            
 
     # dag wiring diagram
     fetch_next_import_job() >> page_through_source()
