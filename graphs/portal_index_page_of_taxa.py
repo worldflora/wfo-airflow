@@ -13,10 +13,10 @@ from includes.fyllo_api import FylloApi
 os.environ['NO_PROXY'] = '*'
 
 @dag(
-    schedule=DeltaTriggerTimetable(timedelta(minutes=1)),
+    schedule=DeltaTriggerTimetable(timedelta(seconds=30)),
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,
-    max_active_runs=1,
+    max_active_runs=1, # important because these may overlap if run at 30 second intervals.
     tags=["wfo", "portal"]
 )
 def portal_index_page_of_taxa():
