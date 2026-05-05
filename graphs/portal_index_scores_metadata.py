@@ -13,7 +13,7 @@ from includes.fyllo_api import FylloApi
 os.environ['NO_PROXY'] = '*'
 
 @dag(
-    schedule=None,
+    schedule=DeltaTriggerTimetable(timedelta(minutes=1)),
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,
     tags=["wfo", "portal"],
