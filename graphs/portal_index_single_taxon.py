@@ -36,6 +36,7 @@ def portal_index_single_taxon():
 
         # data should be an array with a single taxon graph in it
         data = portal.getSingleTaxonGraph(wfo_id)
+        print(data)
         if data: return data
         else: raise AirflowFailException("No data returned by portal")
     
@@ -47,6 +48,7 @@ def portal_index_single_taxon():
         if not taxon_values: raise AirflowFailException("No data returned by Fyllo")
 
         portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
+        print(taxon_values)
         data = portal.pushTaxonValues(taxon_values)
         if not data: raise AirflowFailException("No data returned by portal")
 
