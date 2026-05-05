@@ -17,6 +17,7 @@ os.environ['NO_PROXY'] = '*'
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,
     tags=["wfo", "portal"],
+    max_active_runs=1,
     params={"index_all":
         Param( 
             type="boolean",

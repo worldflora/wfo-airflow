@@ -16,6 +16,7 @@ os.environ['NO_PROXY'] = '*'
     schedule=DeltaTriggerTimetable(timedelta(minutes=1)),
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,
+    max_active_runs=1,
     tags=["wfo", "portal"]
 )
 def portal_index_page_of_taxa():
