@@ -26,7 +26,7 @@ def portal_index_page_of_taxa():
     @task()
     def page_through_taxa(**context):
 
-        page_size = 1000
+        page_size = 500
 
         # get a handles on the two applications
         portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
