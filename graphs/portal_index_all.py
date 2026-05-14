@@ -49,6 +49,8 @@ def portal_index_all():
         portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
         since =  portal.getFacetMetadataLastModified()
 
+        print(f"Last mod = {since}")
+
         # fetch it from fyllo
         fyllo = FylloApi(Variable.get("fyllo-api-url"), Variable.get("fyllo-api-token"))
         metadata = fyllo.fetchFacetMetadata(since)
@@ -72,6 +74,8 @@ def portal_index_all():
         print('calling portal for last modified date')
         portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
         since = portal.getSourceMetadataLastModified()
+
+        print(f"Last mod = {since}")
     
         fyllo = FylloApi(Variable.get("fyllo-api-url"), Variable.get("fyllo-api-token"))
         metadata = fyllo.fetchSourceMetadata(since)
@@ -94,6 +98,8 @@ def portal_index_all():
         print('calling portal for last mod date')
         portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
         since = portal.getScoresMetadataLastModified()
+
+        print(f"Last mod = {since}")
 
         # from fyllo
         fyllo = FylloApi(Variable.get("fyllo-api-url"), Variable.get("fyllo-api-token"))
@@ -118,7 +124,9 @@ def portal_index_all():
         print('calling portal for last mod')
         portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
         since = portal.getSnippetsMetadataLastModified()
-    
+        
+        print(f"Last mod = {since}")    
+        
         fyllo = FylloApi(Variable.get("fyllo-api-url"), Variable.get("fyllo-api-token"))
         metadata = fyllo.fetchSnippetsMetadata(since)
         print(f"Metadata documents fetched: {len(metadata['docs'])}")
