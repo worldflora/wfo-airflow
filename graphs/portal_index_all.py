@@ -43,7 +43,7 @@ def portal_index_all():
 
 
     @task.short_circuit()
-    def facets(**context):
+    def facets():
 
         print('calling portal for last modified date')
         portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
@@ -69,7 +69,7 @@ def portal_index_all():
             return True # we've indexed all the facets so move to the next task
     
     @task.short_circuit()
-    def sources(**context):
+    def sources():
     
         print('calling portal for last modified date')
         portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
@@ -80,6 +80,8 @@ def portal_index_all():
         fyllo = FylloApi(Variable.get("fyllo-api-url"), Variable.get("fyllo-api-token"))
         metadata = fyllo.fetchSourceMetadata(since)
         print(f"Metadata documents fetched: {len(metadata['docs'])}")
+
+        print(metadata)
         
         if len(metadata['docs']) > 0: 
             response = portal.pushSourceMetadata(metadata)

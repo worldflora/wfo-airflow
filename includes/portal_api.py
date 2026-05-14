@@ -37,7 +37,7 @@ class PortalApi(ApiBase):
         return data
 
     def getSourceMetadataLastModified(self):
-        # there are facet sources and snippet sources in the index but they are updated by a single call on the facet side
+        # there are facet sources and snippet sources in the index but they are updated by a single call on the fyllo side
         last_mod = 0
 
         # get the facet source last update time
