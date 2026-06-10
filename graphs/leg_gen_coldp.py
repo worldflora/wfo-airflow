@@ -34,12 +34,12 @@ def leg_gen_coldp():
 
         command = f"cd {scripts_dir}; php -d memory_limit=4G gen_coldp.php {date_string} 01"
         print(command)
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        result = subprocess.run(command, shell=True, capture_output=False, text=True)
         if result.returncode:
             print(result.stdout)
             raise AirflowFailException(f"Failed to generate CoLDP file.")
         else:
-            print('Deletes OK')
+            print('Generated OK')
 
 
     run_php_generation_script()
