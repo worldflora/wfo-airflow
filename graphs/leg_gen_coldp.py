@@ -32,7 +32,7 @@ def leg_gen_coldp():
 
         date_string = datetime.now().strftime("%Y-%m-%d")
 
-        command = f"cd {scripts_dir}; php -d memory_limit=4G gen_coldp.php {date_string} 01"
+        command = f"cd {scripts_dir}; php -d memory_limit=6G gen_coldp.php {date_string} 01"
         print(command)
         result = subprocess.run(command, shell=True, capture_output=False, text=True)
         if result.returncode:
