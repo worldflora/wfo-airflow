@@ -14,6 +14,8 @@ class ApiBase:
                   "Content-Type": "application/json"
               }
         response = requests.post(self.api_url, headers=headers, timeout=120, data=json.dumps(payload))
+
+        print("POST: " + self.api_url)
         
         try:
             return response.json()
@@ -26,6 +28,8 @@ class ApiBase:
     def doGet(self, params):
         headers = {"Authorization": "Bearer " + self.api_token}
         response = requests.get(self.api_url, headers=headers, timeout=120, params=params)
+
+        print("GET: " + self.api_url)
 
         try:
             return response.json()

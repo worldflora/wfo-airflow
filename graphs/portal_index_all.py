@@ -36,6 +36,7 @@ so that we don't get broken links (or at least missing data) within the portal.
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,
     doc_md=doc_md,
+    max_active_runs=1,
     tags=["wfo", "portal"],
     params={},
 )
@@ -176,7 +177,7 @@ def portal_index_all():
         print("Done a page of taxa")
 
     # dag wiring diagram
-    facets() >> sources() >> scores() >> snippets() >> taxa()
+    facets() >> sources() >> snippets() >> taxa()
 
 portal_index_all()
 
