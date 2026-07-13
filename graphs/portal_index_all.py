@@ -177,7 +177,7 @@ def portal_index_all():
         print("Done a page of taxa")
 
     # dag wiring diagram
-    facets() >> sources() >> snippets() >> taxa()
+    facets() >> sources() >> taxa()
 
 portal_index_all()
 
