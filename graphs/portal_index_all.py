@@ -25,8 +25,6 @@ so that we don't get broken links (or at least missing data) within the portal.
 
 1. *Facets* (and their values) are indexed first because they refer to nothing else.
 2. *Data Sources* are indexed next because they reference facet values (one per data source).
-3. *Scores* are then indexed because they join taxa (that will already be in the index as part of the classification) with data sources and facet values.
-4. Text *Snippets* follow. They reference data sources only.
 5. *Taxa* are the final things to be indexed as they reference everything!
 
 """
@@ -93,56 +91,6 @@ def portal_index_all():
             return False
         else: 
             print("we've indexed all the sources so move to the next task")
-            return True
-    
-    @task.short_circuit()
-    def scores(**context):
-
-        print('calling portal for last mod date')
-        portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
-        since = portal.getScoresMetadataLastModified()
-
-        print(f"Last mod = {since}")
-
-        # from fyllo
-        fyllo = FylloApi(Variable.get("fyllo-api-url"), Variable.get("fyllo-api-token"))
-        metadata = fyllo.fetchScoresMetadata(since)
-        print(f"Metadata documents fetched: {len(metadata['docs'])}")
-
-        # to portal
-        if len(metadata['docs']) > 0:
-            response = portal.pushScoresMetadata(metadata)
-            if not response['success']: 
-                print(response['message'])
-                raise AirflowFailException("Failed to save metadata to index")
-            print("we've not finished with scores so don't start on next doc kind")
-            return False
-        else:
-            print("Nothing to push good to go to next task")
-            return True # good to continue to next document kind
-
-    @task.short_circuit()
-    def snippets(**context):
-        
-        print('calling portal for last mod')
-        portal = PortalApi(Variable.get("portal-api-url"), Variable.get("portal-api-token"))
-        since = portal.getSnippetsMetadataLastModified()
-        
-        print(f"Last mod = {since}")    
-        
-        fyllo = FylloApi(Variable.get("fyllo-api-url"), Variable.get("fyllo-api-token"))
-        metadata = fyllo.fetchSnippetsMetadata(since)
-        print(f"Metadata documents fetched: {len(metadata['docs'])}")
-
-        if len(metadata['docs']) > 0:
-            response = portal.pushSnippetsMetadata(metadata)
-            if not response['success']: 
-                print(response['message'])
-                raise AirflowFailException("Failed to save metadata to index")
-            print("Not finished yet so don't proceed to taxa yet")
-            return False
-        else:
-            print("Nothing to push so good to go to taxa")
             return True
         
     @task
