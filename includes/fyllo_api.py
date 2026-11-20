@@ -33,6 +33,11 @@ class FylloApi(ApiBase):
         return self.doGet({
             'import': 'next'
         })
-    
+
+    def fetchIndexerOn(self):
+        return self.doGet({
+            'index_taxa_on': 'check'
+        })
+
     def pageImportJob(self, data):
         return self.doGet(data)

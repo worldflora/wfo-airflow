@@ -40,7 +40,6 @@ so that we don't get broken links (or at least missing data) within the portal.
 )
 def portal_index_all():
 
-
     @task.short_circuit()
     def facets():
 
@@ -92,7 +91,22 @@ def portal_index_all():
         else: 
             print("we've indexed all the sources so move to the next task")
             return True
-        
+
+    @task.short_circuit()
+    def taxa_indexer_on():
+
+        print('calling fyllo to see if taxon indexing is on or not')
+        fyllo = FylloApi(Variable.get("fyllo-api-url"), Variable.get("fyllo-api-token"))
+
+        fyllo = FylloApi(Variable.get("fyllo-api-url"), Variable.get("fyllo-api-token"))
+        metadata = fyllo.fetchIndexerOn()
+        if metadata["on"]:
+            print(f"Indexer is on for taxa is on till: {metadata["offAt"]}")
+            return True # ok to continue indexing some taxa
+        else:
+            print(f"Indexer for taxa is off")
+            return False
+
     @task
     def taxa():
         
@@ -125,7 +139,7 @@ def portal_index_all():
         print("Done a page of taxa")
 
     # dag wiring diagram
-    facets() >> sources() >> taxa()
+    facets() >> sources() >> taxa_indexer_on() >> taxa()
 
 portal_index_all()
 
